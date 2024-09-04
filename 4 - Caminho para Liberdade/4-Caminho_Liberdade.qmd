@@ -1,0 +1,266 @@
+---
+Encoding: UTF-8 Unicode
+lang: pt  
+title: "GED-13: Probabilidade e Estatística"
+subtitle: "S04: Valor Esperado" 
+author: "Augusto Nascimento"
+date: 2024-08-26
+date-format: YYYY[ / 2o. semestre]
+format:
+  html:
+    theme: cosmo
+    toc: true
+execute:
+  echo: true
+  eval: true
+  warning: false    
+---
+
+> Neste exemplo será ilustrado como calcular valores esperados utilizando simulação.
+
+## Um longo caminho para a liberdade
+
+Em uma prisão há uma cela com três portas. Uma das portas (A) leva a um túnel que trará o prisioneiro de volta à cela após 2 dias de "viagem". A segunda porta (B) também leva a um túnel que retorna à cela após um percurso de 4 dias. Finalmente, a terceira porta (C) se abre para um túnel que leva o prisioneiro para a liberdade, após uma jornada de 1 dia. O prisioneiro sempre seleciona as portas A, B e C com probabilidades 0.3, 0.5 e 0.2.
+
+![_Edward Steed, "Two men tunnel out of a prison"_](img/prison-escape-tunnel.png)
+
+Considere as seguintes situações:
+
+1. O prisioneiro lembra as portas que já escolheu no passado, de forma que, na eventualidade de retornar à cela, não escolherá um caminho previamente percorrido.
+
+2. Todas as vezes que acabar retornando à cela, o prisioneiro leva uma pancada na cabeça e esquece que portas já escolheu. Sendo assim, pode repetir caminhos previamente percorridos.
+
+*Para cada uma das situações descritas, em média quantos dias são necessários para um prisioneiro detido nesta cela alcançar a liberdade?*
+
+### Solução Analítica
+
+Vamos calcular o tempo médio esperado para que o prisioneiro alcance a liberdade.
+
+Definição das Variáveis
+
+- Probabilidade de escolher a porta A: `p_A = 0.3`
+- Probabilidade de escolher a porta B: `p_B = 0.5`
+- Probabilidade de escolher a porta C: `p_C = 0.2`
+- Tempo para retornar à cela pela porta A: `2 dias`
+- Tempo para retornar à cela pela porta B: `4 dias`
+- Tempo para alcançar a liberdade pela porta C: `1 dia`
+
+`
+p[A]=0.3
+p[B]=0.5
+p[C]=0.2
+d_A=2
+d_B=4
+d_C=1
+`
+
+Observe o mapa esquematizado:
+
+![Mapa esquematizado](img/mapa.png)
+
+
+Para cada acaminho de atingir a liberdade temos uma probabilidade associada. Supomos que cada ramo mantem sua proporção de probabilidade, de forma que após abrir a porta A, à cela, as novas probabilidade serão (`E_A`é o Evento em que abre-se a porta A):
+
+$$ 
+p[B|E_A]=\frac{p[B]}{p[B]+p[C]}=\frac{0,5}{0,7} 
+$$
+$$ 
+p[C|E_A]=\frac{p[C]}{p[B]+p[C]}=\frac{0,2}{0,7} 
+$$
+
+Para calcularmos o tempomédio esperado iremos multiplicar a probabilidade de cada caminho por sua respectiva probabilidade. De modo que teremos:
+$$
+T_{médio}=\underbrace{(0,3\times\frac{0,5}{0,7}\times1)}_{\text{probabilidade}} \times \underbrace{(2+4+1)}_{\text{número de dias}}+
+\underbrace{(0,3\times\frac{0,2}{0,7})}_{\text{probabilidade}}\times\underbrace{(2+1)}_{\text{número de dias}}+$$
+$$
++\underbrace{(0,5\times\frac{0,3}{0,5}\times1)}_{\text{probabilidade}}\times\underbrace{(4+2+1)}_{\text{número de dias}}+
+\underbrace{(0,5\times\frac{0,2}{0,5})}_{\text{probabilidade}}\times\underbrace{(4+1)}_{\text{número de dias}}+
+(0,2)\times1
+$$
+
+```{r}
+T_medio=0.3*0.5*7/0.7+0.3*0.2*3/0.7+0.5*0.3*7/0.5+0.5*0.2*5/0.5+0.2*1
+
+T_medio
+```
+**Caso em que há esquecimento**
+
+
+![Mapa esquematizado](img/mapa_infinito.png)
+
+
+Podemos solucionar esse caso da seguinte forma:
+
+$$
+T=0,3\times T_A+0,5\times T_B+0,2\times T_C
+$$
+Em que
+$$
+T_A=2+T
+$$
+$$
+T_B=4+T
+$$
+$$
+T_C=1
+$$
+
+Dessa maneira, 
+$$
+T=0,3\times (2+T)+0,5\times (4+T)+0,2\times 1 \Rightarrow 0,2T=2,8 \\ \Rightarrow T=14
+$$
+
+## Solução via Simulação de Monte Carlo.
+
+1. Primeiro, vamos construir uma função para simular uma fuga, para cada uma das situações descritas:
+
+```{r}
+#| warning: false
+#| 
+# carrega pacotes
+library(tidyverse)
+```
+
+```{r}
+# Limpa área de trabalho
+rm(list = ls())
+
+# Situação 1:
+# o prisioneiro lembra os caminho previamente percorridos 
+fuga_lembra <- function(p_portas, t_viagem){
+  # Argumentos: 
+  # p_portas: vetor com as probabilidades de escolher cada uma das portas
+  # t_viagem: vetor com os tempos de viagem para cada porta
+  
+  # Saida:
+  # Tempo de viagem para o caminho percorrido
+  resposta <- c()
+  
+  resample <- function(x, ...) x[sample.int(length(x), ...)]
+  ##    |-> função para sortear uma das portas possíveis 
+  ##        ver help(sample) => Run Examples
+  
+  NPortas       <- length(p_portas)
+  escolhe_porta <- 0
+  tempo_viagem  <- 0
+  caminho       <- 0
+
+  while(escolhe_porta != 3){
+    resta_porta   <- setdiff(1:NPortas, unique(caminho))
+    escolhe_porta <- resample(resta_porta, size = 1, prob = p_portas[resta_porta])  
+    # o correto seria atualizar as probabilidades, 
+    # mas os numeradores permanecem inalterados (apenas o denominador muda)
+    caminho       <- c(caminho, escolhe_porta)
+    tempo_viagem  <- tempo_viagem + t_viagem[escolhe_porta]
+  }
+  
+  resposta$tempo_viagem <- tempo_viagem
+  resposta$caminho      <- caminho
+  return(resposta)
+}
+
+# Situação 2:
+# o prisioneiro esquece os caminho previamente percorridos 
+fuga_esquece <- function(p_portas, t_viagem){
+  # Argumentos: 
+  # p_portas: vetor com as probabilidades de escolher cada uma das portas
+  # t_viagem: vetor com os tempos de viagem para cada porta
+  
+  # Saida:
+  # Tempo de viagem para o caminho percorrido
+  resposta <- c()
+  
+  resample <- function(x, ...) x[sample.int(length(x), ...)]
+  ##    |-> função para sortear uma das portas possíveis 
+  
+  NPortas       <- length(p_portas)
+  escolhe_porta <- 0
+  tempo_viagem  <- 0
+  caminho       <- 0
+
+  while(escolhe_porta != 3){
+    escolhe_porta <- resample(1:NPortas, size = 1, prob = p_portas)
+    caminho       <- c(caminho, escolhe_porta)
+    tempo_viagem  <- tempo_viagem + t_viagem[escolhe_porta]
+  }
+  
+  resposta$tempo_viagem <- tempo_viagem
+  resposta$caminho      <- caminho
+  return(resposta)  
+}
+```
+
+2. Agora, vamos utilizar as funções construídas para obter estimativas para o tempo de viagem esperado até alcançar a liberdade, para as duas situações:
+
+```{r}
+nSim    <- 10^2              # número de fugas simuladas
+PPortas <- c(0.3, 0.5, 0.2)  # probabilidade de escolher as portas
+TViagem <- c(2, 4, 1)        # tempo de viagem para as portas
+
+tempo_viagem_1 <- replicate(nSim, fuga_lembra(PPortas, TViagem)$tempo_viagem)
+tempo_viagem_2 <- replicate(nSim, fuga_esquece(PPortas, TViagem)$tempo_viagem)
+```
+
+**Visualização dos Resultados (parciais)**
+
+```{r, message=FALSE, fig.height=10, fig.width=6}
+# Visualização de Resultados
+par(mfrow = c(2,1),  col ="gray")
+hist(tempo_viagem_1, freq = FALSE, 
+     main = "",
+     xlab = "Tempo de Viagem (dias)")
+mtext("Situação 1: O prisioneiro lembra os caminhos previamente percorridos", 
+      side = 3, line = 1)
+abline(v = mean(tempo_viagem_1), col = "red", lty = "dashed")
+
+hist(tempo_viagem_2, freq = FALSE, 
+     main = "",
+     xlab = "Tempo de Viagem (dias)")
+mtext("Situação 2: O prisioneiro não lembra os caminhos previamente percorridos", 
+      side = 3, line = 1)
+abline(v = mean(tempo_viagem_2), col = "red", lty = "dashed")
+```
+
+Cada linha tracejada vermelha representa uma estimativa para o tempo esperado de fuga com base em `r nSim` fugas simuladas. Agora, precisamos determinar a distribuição amostral do tempo esperado de fuga, replicando essas simulações um grande número de vezes.
+
+```{r}
+nSim <- 10^2   # número de fugas simuladas
+nRep <- 10^2   # número de caminhos
+
+# matriz com os tempos de viagem calculados para `nRep` replicações de `nSim` fugas simuladas
+tempo_viagem_1_M <- replicate(nRep, replicate(nSim, fuga_lembra(PPortas, TViagem)$tempo_viagem))
+  # |-> cada coluna representa uma replicação
+
+tempo_viagem_2_M <- replicate(nRep, replicate(nSim, fuga_esquece(PPortas, TViagem)$tempo_viagem))
+  # |-> cada coluna representa uma replicação
+
+# Os tempos esperados são calculados tomando as médias de cada coluna
+E_viagem_1 <- colMeans(tempo_viagem_1_M)
+E_viagem_2 <- colMeans(tempo_viagem_2_M)
+```
+
+**Visualização dos Resultados**
+
+```{r, message=FALSE, fig.height=10, fig.width=12}
+# Visualização de Resultados
+par(mfrow = c(2,1),  col ="gray")
+hist(E_viagem_1, freq = FALSE, 
+     main = "",
+     xlab = "Tempo Esperado de Viagem (dias)")
+mtext("Situação 1: O prisioneiro lembra os caminhos previamente percorridos", 
+      side = 3, line = 1)
+abline(v = mean(E_viagem_1), col = "red", lty = "dashed")
+
+hist(E_viagem_2, freq = FALSE, 
+     main = "",
+     xlab = "Tempo Esperado de Viagem (dias)")
+mtext("Situação 2: O prisioneiro não lembra os caminhos previamente percorridos", 
+      side = 3, line = 1)
+abline(v = mean(E_viagem_2), col = "red", lty = "dashed")
+```
+
+Você consegue construir um gráfico resentando os vários caminhos aleatórios simulados (ie, Tempo Esperado de Viagem x Número de Fugas Simuladas)?
+
+
+----
+
