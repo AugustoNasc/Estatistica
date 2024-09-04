@@ -1,0 +1,474 @@
+---
+Encoding: UTF-8 Unicode
+lang: pt  
+title: "GED-13: Probabilidade e Estatística"
+subtitle: "S03: Probabilidade Condicional" 
+author: "Augusto Nascimento de Oliveira"
+date: 2024-08-25
+date-format: YYYY[ / 2o. semestre]
+format:
+  html:
+    theme: cosmo
+    toc: true
+execute:
+  echo: true
+  eval: true
+  warning: false    
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+## PRÁTICA: Uma variação do Problema de Monty Hall
+
+Consideremos agora a seguinte versão do problema:
+
+Num jogo de auditório, o apresentador mostra ao participante três portas
+fechadas. Atrás de apenas uma das portas há um prêmio; atrás das outras,
+há um bode. O participante é convidado a escolher uma das portas; feito
+isto, o apresentador, que esqueceu a porta que esconde o prêmio, abre ao
+acaso uma das portas restantes. Por sorte, a porta que o apresentador
+abriu revela um bode. Aliviado, o apresentador pergunta, então, se o
+participante deseja trocar a porta inicialmente escolhida pela que
+permaneceu fechada. Neste caso, qual é a melhor opção?
+
+## Solução analítica
+
+Considere os seguintes eventos:
+
+$A$ = o prêmio está atrás da porta 1\
+$B$ = o prêmio está atrás da porta 2\
+$C$ = o prêmio está atrás da porta 3\
+$D_i$ = o apresentador abre a porta $i$, para $i = 1, 2, 3$
+
+Como sabemos que há apenas um prêmio e que ele deve necessariamente
+estar escondido atrás de uma das portas, os eventos A, B e C formam uma
+partição do espaço amostral. Assumindo que a porta que esconde o prêmio
+foi selecionada ao acaso, pelo princípio da indiferença, temos:
+
+$$
+P[A] = P[B] = P[C] = 1/3
+$$
+
+Sem perda de generalidade, vamos considerar que o participante escolhe a
+porta 1. Na segunda etapa do jogo, o apresentador deverá abrir uma
+porta, a qual, nesse caso, por sorte é uma porta não premiada.
+Independentemente se a porta premiada é a porta 1, escolhida pelo
+participante, ou não o apresentador pode escolher abrir qualquer uma das
+duas portas restantes, 2 ou 3, com iguais probabilidades, pois ele não
+sabe onde está o prêmio. De forma que temos as seguintes probabilidades
+condicionais:
+
+$$
+P[D_2 | A]  = P[D_3 | A] = 1/2
+$$
+
+Sem perda de generalidade, vamos supor que o apresentador abre a porta 2
+e mostra que o prêmio não está lá. O participante agora tem uma decisão
+a tomar: ou mantém sua escolha inicial e fica com a porta 1, ou troca de
+porta e fica com a porta 3. Ao revelar a porta não-premiada, o
+apresentador está fornecendo informação adicional ao participante,
+contudo esta é uma informação inútil. Assim, para decidir se vale a pena
+realizar a troca basta calcular as probabilidades *a posteriori* de que
+o prêmio esteja atrás da porta 1 ou da porta 3, dadas por $P[A | D_2]$ e
+$P[C | D_2]$, respectivamente.
+
+Utilizando a definição de probabilidade condicional, temos:
+
+$$
+P[A | D_2] = \frac{P[A\cap D_2]}{P[D_2]} \quad \textsf{e} \quad P[C | D_2] = \frac{P[C\cap D_2]}{P[D_2]}
+$$ A probabilidade $P[D_2]$ pode ser calculada utilizando o Teorema da
+Probabilidade Total, considerando uma partição do espaço amostral
+adequada.
+
+Além disso, note que
+
+$$
+P[B | D_2] = \frac{P[B\cap D_2]}{P[D_2]} = \frac{P[D_2|B]P[B]}{P[D_2]} \quad \textsf{e, como, P[B]} \neq 0 \quad P[D_2|B]=0
+$$
+
+Como $A, B, C$ formam uma partição do espaço amostral,
+$AD_2, BD_2, CD_2$ formam uma partição do evento $D_2$, de forma que:
+
+$$
+D_2 = AD_2 \cup BD_2 \cup CD_2
+$$
+
+Portanto,
+
+$$
+\begin{align*}
+P[D_2]  
+&= P[AD_2 \cup BD_2 \cup CD_2]  \\
+&= P[AD_2] + P[BD_2]+ P [CD_2]  \\
+&= P[AD_2] + P[BD_2]+ P [CD_2]  \\
+&= P[D_2|A]P[A] + P[D_2|B]P[B]+ P [D_2|C]P[C]
+\end{align*}
+$$ Nesse caso, o apresentador poderia abrir a porta 2 mesmo que o prêmio
+estivesse atrás dela, de forma que $P[D_2|B] = 1/2$. Sabemos que, no
+final, o apresentador não escolhe a porta premiada, mas é crucial que
+registremos que houve essa possibilidade. Se o prêmio estiver atrás da
+porta 1 (a escolha inicial do participante), também teremos que
+$P[D_2|A] = 1/2$ e, finalmente, se o prêmio estiver atrás da porta 3,
+igualmente o apresentador continuará com a mesma distribuição de
+probabilidades, de forma que $P[D_2|C] = 1/2$. Assim, temos:
+
+$$
+\begin{align*}
+P[D_2]  
+&= \frac{1}{2} \times \frac{1}{3} + 0 \times \frac{1}{3} + \frac{1}{2} \times \frac{1}{3} = \frac{1}{3}
+\end{align*}
+$$ Portanto, a probabilidade de a porta premiada ser a escolha inicial
+do participante vale:
+
+$$
+P[A | D_2] = \frac{P[D_2|A]P[A]}{P[D_2]} = \frac{\frac{1}{2}\times\frac{1}{3}}{\frac{1}{3}} = \frac{1}{2}
+$$
+
+E a probabilidade de a porta premiada ser a que permaneceu fechada vale:
+
+$$
+P[C | D_2] = \frac{P[D_2|C]P[C]}{P[D_2]} = \frac{\frac{1}{2}\times\frac{1}{3}}{\frac{1}{3}} = \frac{1}{2}
+$$
+
+Desta forma, não há vantagem em troca de porta, haja vista que
+continua-se tendo a mesma probabilidade: \frac{1}{3}.
+
+## Simulação de Monte Carlo
+
+Escrevemos um programa em R para simular esta versão do jogo e, assim,
+obter uma estimativa da probabilidade de vencer o jogo, considerando as
+seguintes estratégias: (i) o participante sempre fica com a porta
+original; (ii) o participante sempre troca de porta.
+
+Vamos agora resolver este problema através de simulação, a fim de
+encontrar uma aproximação (estimativa) para cada probabilidade desejada.
+
+```{r}
+#| warning: false
+#| 
+# carrega pacotes
+library(tidyverse)
+```
+
+Nesse caso particular de Monty Hall é preciso sempre considerar que o
+apresentador terá duas opções de escolha, contudo verificamos que não
+ocorre de ser a porta premiada a porta aberta. De forma que nossa
+estratégia será verificar todas as possibilidades e descartar as que o
+apresentador abre uma porta premiada.
+
+```{r}
+revela_porta <- function(n_portas = 3, porta_premiada, escolha_inicial){
+  #
+  # Argumentos:
+  # n_portas = número de portas no jogo
+  # porta_premiada = porta onde se encontra o prêmio
+  # escolha_inicial = porta escolhida pelo participante no início do jogo
+  #
+  # Saída:
+  # porta_revelada =  no. da porta revelada pelo apresentador
+  
+  # portas disponíveis
+  portas <- 1:n_portas
+  
+    porta_revelada <- sample(x = portas[-escolha_inicial], size = 1)
+    
+  return(porta_revelada)
+}
+```
+
+Primeiro, vamos considerar a situação em que a estratégia do
+participante consiste em sempre manter a primeira porta escolhida.
+Faremos isto através de uma função construída para realizar esta tarefa.
+Para um jogo com um número de portas igual a `n_portas`, a função abaixo
+retorna se o participante ganhou o prêmio, ao decidir manter sua escolha
+inicial.
+
+```{r}
+mantem_porta <- function(n_portas = 3, escolha_inicial = 1){
+  #
+  # Argumento:
+  # n_portas = número de portas no jogo
+  #
+  # Saída:
+  # resultado do jogo (ganhou = TRUE / perdeu = FALSE)
+  
+  # portas disponíveis
+  portas <- 1:n_portas
+  
+  # sorteia a porta premiada
+  porta_premiada <- sample(x = portas, size = 1)
+
+  # porta escolhida pelo participante
+  porta_escolhida <- escolha_inicial
+  
+  # utiliza função `revela_porta` para que o apresentador
+  # escolha a porta a ser revelada
+  porta_revelada <- revela_porta(n_portas, porta_premiada, escolha_inicial)
+  if(porta_revelada==porta_premiada)
+    return(-1)
+
+  # verifica se o participante escolheu a porta premiada
+  resultado <- porta_escolhida == porta_premiada
+  return(resultado)
+}
+```
+
+A função abaixo implementa a estratégia do participante de sempre trocar
+a porta inicialmente selecionada, a depender da porta que é revelada
+pelo apresentador, retornando se o participante ganhou o prêmio.
+
+```{r}
+troca_porta <- function(n_portas = 3, escolha_inicial = 1, ...){
+  #
+  # Argumentos:
+  # n_portas = número de portas no jogo
+  # escolha_inicial = porta escolhida pelo participante no início do jogo
+  #
+  # Saída:
+  # resultado do jogo: (ganhou = TRUE / perdeu = FALSE)
+  
+  portas <- 1:n_portas
+
+  # sorteia a porta premiada
+  porta_premiada <- sample(x = portas, size = 1)
+
+  # utiliza função `revela_porta` para que o apresentador
+  # escolha a porta a ser revelada
+  porta_revelada <- revela_porta(n_portas, porta_premiada, escolha_inicial)
+  if(porta_revelada==porta_premiada)
+    return(-1)
+  
+  # participante troca a porta inicial pela que permanece fechada
+  porta_escolhida <- portas[-c(escolha_inicial, porta_revelada)]
+  
+  # verifica se o participante escolheu a porta premiada
+  resultado <- porta_escolhida == porta_premiada
+  return(resultado)
+}
+```
+
+Vamos estimar as probabilidades de ganho para cada uma das estratégias
+possíveis, participando do jogo repetidas vezes. Note que cada uma das
+probabilidades será estimada com base em um caminho aleatório
+(micro-experimento):
+
+```{r}
+# fixa semente de números pseudo-aleatórios
+set.seed(11)
+Njogos <- 1000 # número de jogos simulados
+
+# Simula os jogos
+estrategia_1 <- replicate(Njogos, mantem_porta())
+
+# Inicializa o vetor de frequência relativa
+freq_rel_1 <- numeric(Njogos)
+
+# Inicializa contadores
+soma_acumulada_1 <- 0
+contagem_valida_1 <- 0
+
+# Calcula a frequência relativa acumulada
+for (i in 1:Njogos) {
+  if (estrategia_1[i] != -1) {
+    soma_acumulada_1 <- soma_acumulada_1 + estrategia_1[i]
+    contagem_valida_1 <- contagem_valida_1 + 1
+  }
+  freq_rel_1[i] <- soma_acumulada_1 / contagem_valida_1
+}
+
+set.seed(11)
+# Simula os jogos
+estrategia_2 <- replicate(Njogos, troca_porta())
+
+# Inicializa o vetor de frequência relativa
+freq_rel_2 <- numeric(Njogos)
+
+# Inicializa contadores
+soma_acumulada_2 <- 0
+contagem_valida_2 <- 0
+
+# Calcula a frequência relativa acumulada
+for (i in 1:Njogos) {
+  if (estrategia_2[i] != -1) {
+    soma_acumulada_2 <- soma_acumulada_2 + estrategia_2[i]
+    contagem_valida_2 <- contagem_valida_2 + 1
+  }
+  freq_rel_2[i] <- soma_acumulada_2 / contagem_valida_2
+}
+```
+
+Como foi usada a IA: ![Pergunta 1 ao copilot da
+Microsoft](img/copiloto.png) Segunda pergunta: ![Pergunta 2 ao chat
+gpt](img/gpt2.png)
+
+Os valores estimados com base em `r Njogos` repetições do jogo para as
+probabilidades de ganho quando o participante utiliza as duas
+estratégias distintas são:
+
+```{r}
+# imprime resultados:
+cat(paste("Número de Jogos:", Njogos,
+          "\nFrequencia Relativa de Ganhos (Estratégia 1):", freq_rel_1[Njogos], 
+          "\nFrequencia Relativa de Ganhos (Estratégia 2):", freq_rel_2[Njogos]))
+```
+
+Agora, podemos construir algumas visualizações para observar a evolução
+dos valores de frequência relativa para cada uma das estratégias,
+conforme o jogo é repetido:
+
+```{r}
+# Visualização dos resultados
+
+# Organiza as frequências relativas calculadas em uma tabela
+freq_rel_df <- data.frame(
+  Jogos = 1:Njogos,
+  F1 = freq_rel_1,
+  F2 = freq_rel_2
+)
+
+prob_teo <- c(1/2, 1/2)
+
+# Transforma tabela para facilitar construção do gráfico
+library(reshape2)
+freq_rel_melted <- melt(freq_rel_df, id.vars = "Jogos")
+
+# Constrói curvas de freq. relativa
+ggplot(freq_rel_melted, aes(x = Jogos, y = value, color = variable)) +
+  geom_line() +
+  scale_y_continuous(limits = c(0, 1)) +
+  scale_color_manual(values = c("blue", "orange"), 
+                     labels = c("Estratégia 1", "Estratégia 2")) +
+  labs(x = "no. de jogos", y = "freq. relativa de ganhos") +
+  
+  # Adiciona linhas tracejadas (valores de probabilidade estimados)
+  geom_hline(yintercept = c(freq_rel_1[Njogos], freq_rel_2[Njogos]), 
+             color = c("blue", "orange"), linetype = "dashed") +
+  
+  # Adiciona linhas tracejadas (valores de probabilidade teóricos)
+  geom_hline(yintercept = prob_teo, color = "black", linetype = "dashed") +
+  
+  # Posiciona legenda
+  theme(legend.position = "bottomright") +
+  
+  # Adiciona anotações (legenda)
+  annotate("text", 
+           x = 0.2 * Njogos, y = freq_rel_1[Njogos] + 0.1,
+           label = paste0("P_estimada [Estratégia 1]: ", round(freq_rel_1[Njogos], 4)),
+           color = "blue", hjust = 0, size = 3.5) +
+  annotate("text", 
+           x = 0.2 * Njogos, y = freq_rel_2[Njogos] + 0.2,
+           label = paste0("P_estimada [Estratégia 2]: ", round(freq_rel_2[Njogos], 4)),
+           color = "orange", hjust = 0, size = 3.5) +
+  annotate("text", x = 0.75 * Njogos, y = 0.01,
+           label = "-- Probabilidade Teórica", color = "black", hjust = 0, size = 3.5)
+
+```
+
+O Chunck acima foi obtido ao mudar prob_teorico de acordo com nosso
+problema, já que no problema clássimo de Monty Hall tínhamos prob_teo
+\<- c(1/3, 1/3), e perguntar ao chatGPT como fazer para que as legendas
+P_estimada\[Estratégia x\] (x pode ser 1 ou 2) não se sobrepusessem.
+
+As linhas tracejadas pretas representam as probabilidades teóricas (que
+assumimos desconhecidas) que desejamos estimar com base no experimento
+que consiste em jogar `Njogos` partidas do jogo. Perceba que, se não
+conhecêssemos o valor das probabilidades teóricas, não teríamos como
+avaliar a qualidade das estimativas obtidas. Sendo assim, a fim de obter
+informação a respeito da variabilidade associada à estimação via Método
+de Monte Carlo, precisamos realizar `Nsim` replicações do experimento.
+Isto significa que devemos percorrer `Nsim` caminhos aleatórios.
+
+```{r}
+# exemplos de parâmetros
+Nsim   <- 50    # número de simulações (caminhos aleatórios)
+Njogos <- 1000  # número de partidas a serem realizadas em cada simulação
+
+# realiza as `Nsim` replicações do experimento 
+# (i.e., constrói `Nsim` caminhos aleatórios)
+set.seed(11)
+
+caminhos_estrategia_1 <- replicate(Nsim, {
+  # camada interna: realiza o jogo `Njogos` vezes
+  replicate(Njogos, mantem_porta(), simplify = TRUE)
+}, simplify = TRUE)
+
+set.seed(11)
+
+caminhos_estrategia_2 <- replicate(Nsim, {
+  # camada interna: realiza o jogo `Njogos` vezes
+  replicate(Njogos, troca_porta(), simplify = TRUE)
+}, simplify = TRUE)
+
+# Função personalizada para calcular a frequência relativa acumulada
+# ignorando os valores -1 e mantendo o valor anterior nesses casos
+calcula_freq_relativa <- function(resultados) {
+  freq_rel <- numeric(length(resultados))
+  soma_acumulada <- 0
+  contagem_valida <- 0
+  
+  for (i in 1:length(resultados)) {
+    if (resultados[i] != -1) {
+      soma_acumulada <- soma_acumulada + resultados[i]
+      contagem_valida <- contagem_valida + 1
+    }
+    freq_rel[i] <- soma_acumulada / contagem_valida
+  }
+  
+  return(freq_rel)
+}
+
+# Calcula as frequências relativas para todas as simulações
+freq_rel_all_1 <- apply(caminhos_estrategia_1, 2, calcula_freq_relativa)
+freq_rel_all_2 <- apply(caminhos_estrategia_2, 2, calcula_freq_relativa)
+
+# Converte matrizes obtidas para o formato de tabela (para usar com ggplot)
+freq_rel_1_df <- as.data.frame(freq_rel_all_1)
+freq_rel_1_df$Jogos <- 1:Njogos 
+
+freq_rel_2_df <- as.data.frame(freq_rel_all_2)
+freq_rel_2_df$Jogos <- 1:Njogos 
+
+# Converte tabelas (data frame) para formato 'long'
+library(tidyr)
+freq_rel_1_long <- pivot_longer(freq_rel_1_df, 
+                                cols = -Jogos, 
+                                names_to = "Jogo", 
+                                values_to = "Frequencia_Relativa")
+
+freq_rel_2_long <- pivot_longer(freq_rel_2_df, 
+                                cols = -Jogos, 
+                                names_to = "Jogo", 
+                                values_to = "Frequencia_Relativa")
+
+```
+
+Esse chunck foi feito por IA. ![Pergunta ao Copilot](img/copilot1.png)
+![Pergunta 2 ao Copilot](img/copilot2.png) ![Pergunta 3 ao
+Copilot](img/copilot3.png)
+
+```{r}
+# constrói gráfico de frequências relativas para diferentes caminhos aleatórios
+ggplot(freq_rel_1_long, 
+       aes(x = Jogos, y = Frequencia_Relativa, group = Jogo)) +
+  geom_line(color = "blue", alpha = 0.3) +
+  geom_hline(yintercept = prob_teo[1], linetype = "dashed", color = "black", size = 0.8) +
+  labs(x = "no. de jogos", y = "freq. relativa de ganhos",
+       title = "Estratégia 1: mantém escolha inicial") 
+
+ggplot(freq_rel_2_long, 
+       aes(x = Jogos, y = Frequencia_Relativa, group = Jogo)) +
+  geom_line(color = "orange", alpha = 0.3) +
+  geom_hline(yintercept = prob_teo[2], linetype = "dashed", color = "black", size = 0.8) +
+  labs(x = "no. de jogos", y = "freq. relativa de ganhos",
+       title = "Estratégia 2: troca de porta")
+```
+
+Observamos que a distribuições das frequências relativas de ganhos ao
+utilizar as Estratégias 1 e 2 estão centradas nos valores das
+probabilidades teóricas, respectivamente iguais a 1/2 e 1/2. Portanto,
+concluímos que é indiferente utilizar a Estratégia 2 (trocar de porta),
+pois a probabilidade de ganhar o prêmio é a mesma daquela associada à
+Estratégia 1 (manter escolha inicial).
+
+------------------------------------------------------------------------
